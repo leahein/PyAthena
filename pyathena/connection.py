@@ -82,7 +82,7 @@ class Connection(object):
         response = client.assume_role(
             RoleArn=role_arn,
             RoleSessionName=role_session_name,
-            DurationSeconds=duration_seconds,
+            DurationSeconds=int(duration_seconds),
         )
         return response['Credentials']
 
