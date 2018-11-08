@@ -39,7 +39,16 @@ class Connection(object):
         self.poll_interval = poll_interval
         self.encryption_option = encryption_option
         self.kms_key = kms_key
-
+        if not any((
+                kwargs.get('aws_access_key_id'),
+                kwargs.get('aws_session_token'),
+        )):
+            credentials = Session().get_credentials()
+            kwargs.update({
+                'aws_access_key_id': credentials.access_key,
+                'aws_secret_access_key': credentials.secret_key,
+                'aws_session_token': credentials.token,
+            })
         if role_arn:
             creds = self._assume_role(profile_name, region_name, role_arn,
                                       role_session_name, duration_seconds,
@@ -71,12 +80,6 @@ class Connection(object):
         # MFA is not supported. If you want to use MFA, create a configuration file.
         # http://boto3.readthedocs.io/en/latest/guide/configuration.html#assume-role-provider
 
-        credentials = Session().get_credentials()
-        kwargs.update({
-            'aws_access_key_id': credentials.access_key,
-            'aws_secret_access_key': credentials.secret_key,
-            'aws_session_token': credentials.token,
-        })
         session = Session(profile_name=profile_name, **kwargs)
         client = session.client('sts', region_name=region_name, **kwargs)
         response = client.assume_role(
