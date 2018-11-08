@@ -79,13 +79,12 @@ class Connection(object):
                      role_session_name, duration_seconds, **kwargs):
         # MFA is not supported. If you want to use MFA, create a configuration file.
         # http://boto3.readthedocs.io/en/latest/guide/configuration.html#assume-role-provider
-
         session = Session(profile_name=profile_name, **kwargs)
         client = session.client('sts', region_name=region_name, **kwargs)
         response = client.assume_role(
             RoleArn=role_arn,
             RoleSessionName=role_session_name,
-            DurationSeconds=int(duration_seconds),
+            DurationSeconds=duration_seconds,
         )
         return response['Credentials']
 
